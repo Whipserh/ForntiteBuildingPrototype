@@ -1,15 +1,16 @@
 using JetBrains.Annotations;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class SimpleMoveAround : MonoBehaviour
 {
 
-    private Rigidbody rb;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        rb = gameObject.GetComponent<Rigidbody>();   
+        speed = Vector2.zero; 
     }
 
     private float[] movePlayer = new float[3];/*0 - horizontal movement, 1 - forward/backward movement, 2 - vertical movement*/
@@ -38,6 +39,9 @@ public class SimpleMoveAround : MonoBehaviour
         {
             movePlayer[2] = 0;
         }
+        
+
+
 
         //rotate the camera
         turnCamera = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
@@ -47,15 +51,36 @@ public class SimpleMoveAround : MonoBehaviour
         transform.localEulerAngles = Vector3.right * cameraVerticalRotation;
 
         //look around
-        transform.Rotate(Vector3.up * turnCamera.x);
+        parentTransform.Rotate(Vector3.up * turnCamera.x);
         
     }
 
+    public Transform parentTransform;
     float cameraVerticalRotation;
-    
+
+
+
+
+    public float linearDrag = 1;
+    public float maxSpeed = 10;
+    private Vector2 speed;
     private void FixedUpdate()
     {
-        rb.linearVelocity = (movementSpeed * new Vector3(movePlayer[0], movePlayer[1], 0)) + (elevationSpeed * new Vector3(0, 0, 1));
+
+
+        //since we can't have a moveable rotatable body we'll have to improvise
+
+        //we'll start by adding plane drag where if the player is not using wasd the camera will start to slow down
+        //we don't need to worry about the vertical movement as that will just be purely based on the players pricision movements...
+        //                                                         i just don't want vertical drag
+        if (movePlayer[0] == 0 && movePlayer[1] == 0)
+        {
+            speed = speed.normalized * (speed.magnitude-(linearDrag * Time.fixedDeltaTime));
+        }
+
+        speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
+
+        //transform.Translate(Vector3.zero);
     }
 
 }
