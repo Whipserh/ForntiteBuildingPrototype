@@ -73,12 +73,15 @@ public class SimpleMoveAround : MonoBehaviour
         //we'll start by adding plane drag where if the player is not using wasd the camera will start to slow down
         //we don't need to worry about the vertical movement as that will just be purely based on the players pricision movements...
         //                                                         i just don't want vertical drag
-        if (movePlayer[0] == 0 && movePlayer[1] == 0)
+        if (movePlayer[0] == 0 && movePlayer[1] == 0)//we don't move
         {
             speed = speed.normalized * (speed.magnitude-(linearDrag * Time.fixedDeltaTime));
+        }else//we are moving
+        {
+            Vector2 temp;
         }
 
-        speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
+            speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
 
         //transform.Translate(Vector3.zero);
     }
