@@ -15,7 +15,6 @@ public class SimpleMoveAround : MonoBehaviour
 
     private float[] movePlayer = new float[3];/*0 - horizontal movement, 1 - forward/backward movement, 2 - vertical movement*/
     public float elevationSpeed = 2;
-    public float movementSpeed = 5;
     public float mouseSensitivity = 1;
     private Vector2 turnCamera;
     // Update is called once per frame
@@ -27,12 +26,11 @@ public class SimpleMoveAround : MonoBehaviour
 
 
         //focus on the vertical movement
-        if (Input.GetKeyDown(KeyCode.Q)) //move down vertically
+        if (Input.GetKey(KeyCode.Q)) //move down vertically
         {
-            
             movePlayer[2] = -1;
         }
-        else if (Input.GetKeyDown(KeyCode.E))//move up vertically
+        else if (Input.GetKey(KeyCode.E))//move up vertically
         {
             movePlayer[2] = 1;
         }
@@ -87,10 +85,14 @@ public class SimpleMoveAround : MonoBehaviour
             
             speed += direction * acceleration * Time.fixedDeltaTime;
         }
-
+        
         speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
         
-        parentTransform.Translate(speed * Time.deltaTime);
+        parentTransform.Translate(speed * Time.fixedDeltaTime);
+
+        //move the player up or down
+        Debug.Log(movePlayer[2]);
+        parentTransform.Translate(movePlayer[2] * new Vector3(0,1,0) * elevationSpeed * Time.fixedDeltaTime);
     }
 
 }
