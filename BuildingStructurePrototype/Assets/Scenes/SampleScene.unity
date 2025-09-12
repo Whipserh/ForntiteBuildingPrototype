@@ -305,7 +305,8 @@ MonoBehaviour:
   movementSpeed: 5
   mouseSensitivity: 1
   parentTransform: {fileID: 329394763}
-  linearDrag: 1
+  acceleration: 10
+  linearDrag: 10
   maxSpeed: 10
 --- !u!1 &410087039
 GameObject:

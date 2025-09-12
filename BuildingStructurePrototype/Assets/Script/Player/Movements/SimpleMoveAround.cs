@@ -29,6 +29,7 @@ public class SimpleMoveAround : MonoBehaviour
         //focus on the vertical movement
         if (Input.GetKeyDown(KeyCode.Q)) //move down vertically
         {
+            
             movePlayer[2] = -1;
         }
         else if (Input.GetKeyDown(KeyCode.E))//move up vertically
@@ -60,10 +61,10 @@ public class SimpleMoveAround : MonoBehaviour
 
 
 
-
+    [SerializeField] private float acceleration = 1;
     public float linearDrag = 1;
     public float maxSpeed = 10;
-    private Vector2 speed;
+    private Vector3 speed;
     private void FixedUpdate()
     {
 
@@ -78,12 +79,18 @@ public class SimpleMoveAround : MonoBehaviour
             speed = speed.normalized * (speed.magnitude-(linearDrag * Time.fixedDeltaTime));
         }else//we are moving
         {
-            Vector2 temp;
+            
+            Vector3 horizontalDirection = new Vector3(1,0,0) * movePlayer[0];
+            Vector3 forwardDirection = new Vector3(0, 0, 1) * movePlayer[1]; 
+
+            Vector3 direction = (horizontalDirection + forwardDirection).normalized;
+            
+            speed += direction * acceleration * Time.fixedDeltaTime;
         }
 
-            speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
-
-        //transform.Translate(Vector3.zero);
+        speed = speed.normalized * Mathf.Clamp(speed.magnitude, 0, maxSpeed);
+        
+        parentTransform.Translate(speed * Time.deltaTime);
     }
 
 }
