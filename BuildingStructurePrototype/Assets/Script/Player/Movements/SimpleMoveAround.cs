@@ -91,7 +91,6 @@ public class SimpleMoveAround : MonoBehaviour
         parentTransform.Translate(speed * Time.fixedDeltaTime);
 
         //move the player up or down
-        Debug.Log(movePlayer[2]);
         parentTransform.Translate(movePlayer[2] * new Vector3(0,1,0) * elevationSpeed * Time.fixedDeltaTime);
     }
 

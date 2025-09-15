@@ -4,26 +4,28 @@ using UnityEngine.Rendering;
 
 public class BuildingStructure : MonoBehaviour
 {
-
     [SerializeField]
-    private Transform floor;
+    private Transform buildingTransform;
+    
     [SerializeField]
     private float maxPlacementDistance = 5;
     [SerializeField]
     private float buildingScale = 3;
     private RaycastHit hit;
     
-    private bool buildMode = true;
+    private bool buildMode = false;
 
-    [SerializeField]
-    private GameObject[] structureGuidelines = new GameObject[2];
+    private GameObject structureGuidelines;
     private int structureIndex;
 
+    [SerializeField]
+    private GameObject [] structurePrefabs = new GameObject[2];
+    private bool rotatableStructure = false;
 
-    public GameObject wall;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
         structureIndex = 0;
     }
 
@@ -42,17 +44,38 @@ public class BuildingStructure : MonoBehaviour
         //update buildmode
         if (Physics.Raycast(transform.position, transform.forward, out hit, maxPlacementDistance)){
             Debug.Log(hit.point);
-            
-            Vector3 raycastHit = hit.point/buildingScale;
-            Vector3 floorposition = new Vector3(Mathf.RoundToInt(raycastHit.x), Mathf.RoundToInt(raycastHit.y), Mathf.RoundToInt(raycastHit.z))*buildingScale;
 
-            structureGuidelines[structureIndex].transform.position = floorposition;
+            Vector3 raycastHit = hit.point/buildingScale;
+            Vector3 floorposition = Vector3.zero;
+            
+            switch (structureIndex)
+            {
+                case 0://wall
+                    raycastHit = hit.point / (buildingScale/2);
+                    floorposition = new Vector3(Mathf.RoundToInt(raycastHit.x), Mathf.RoundToInt(raycastHit.y), Mathf.RoundToInt(raycastHit.z)) * (buildingScale/2);
+                    if (floorposition.x % 3 == floorposition.z % 3)
+                        structureGuidelines.transform.position = floorposition + new Vector3(1.5f,0,0);
+                    break;
+                case 1://floor
+                    raycastHit = hit.point / buildingScale;
+                    floorposition = new Vector3(Mathf.RoundToInt(raycastHit.x), Mathf.RoundToInt(raycastHit.y), Mathf.RoundToInt(raycastHit.z)) * buildingScale;
+                    structureGuidelines.transform.position = floorposition;
+                    break;
+            }
+
+            
+
         }
 
-        
-        if (Input.GetMouseButton(0))
+        //rotate the stairs
+        if (structureIndex == 2 && Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("Structure created");
+            structureGuidelines.transform.Rotate(Vector3.up, 90);
+        }
+        
+
+        if (Input.GetMouseButtonDown(0))
+        {
             placeStructure();
         }
 
@@ -60,24 +83,41 @@ public class BuildingStructure : MonoBehaviour
     private void rotateSelectedStructure()
     {
         //turn off current guildline
-        structureGuidelines[structureIndex].SetActive(false);
+        Destroy(structureGuidelines);
 
         //switch to new guideline
-        structureIndex = ++structureIndex % structureGuidelines.Length;
-        structureGuidelines[structureIndex].SetActive(true);
+        structureIndex = ++structureIndex % structurePrefabs.Length;
+        structureGuidelines = Instantiate(structurePrefabs[structureIndex], buildingTransform);
+
+        //if the object is stairs/rotatable
+        rotatableStructure = structureIndex == 2;//2 is the stairs index
     }
 
     //TODO
     private void placeStructure()
     {
-        
+        Debug.Log("Structure created");
+
+        //create the object at the given structure
+        structureGuidelines = Instantiate(structurePrefabs[structureIndex], buildingTransform);
     }
 
+
+    /// <summary>
+    ///changes the gamemode that the player is in
+    /// turns the builder guidelines on and off
+    /// </summary>
     private void toggeBuildMode()
     {
+        Debug.Log(-3%3);
+        Debug.Log("toggled buildmode");
         buildMode = !buildMode;
-        //hide the build guideline from the player
-        structureGuidelines[structureIndex].SetActive(buildMode);
+        //toggle the visibility of the build guideline from the player
+        if(buildMode)
+            structureGuidelines = Instantiate(structurePrefabs[structureIndex], buildingTransform);
+        else
+            Destroy(structureGuidelines);
+
     }
 
 }
