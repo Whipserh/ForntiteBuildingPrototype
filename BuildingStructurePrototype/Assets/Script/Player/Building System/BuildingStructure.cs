@@ -45,26 +45,20 @@ public class BuildingStructure : MonoBehaviour
         if (Physics.Raycast(transform.position, transform.forward, out hit, maxPlacementDistance)){
             Debug.Log(hit.point);
 
-            Vector3 raycastHit = hit.point/buildingScale;
             Vector3 floorposition = Vector3.zero;
             
             switch (structureIndex)
             {
                 case 0://wall
-                    raycastHit = hit.point / (buildingScale/2);
-                    floorposition = new Vector3(Mathf.RoundToInt(raycastHit.x), Mathf.RoundToInt(raycastHit.y), Mathf.RoundToInt(raycastHit.z)) * (buildingScale/2);
+                    floorposition = snapToGrid(hit.point, buildingScale/2, buildingScale, buildingScale/2);
                     if (floorposition.x % 3 == floorposition.z % 3)
                         structureGuidelines.transform.position = floorposition + new Vector3(1.5f,0,0);
                     break;
                 case 1://floor
-                    raycastHit = hit.point / buildingScale;
-                    floorposition = new Vector3(Mathf.RoundToInt(raycastHit.x), Mathf.RoundToInt(raycastHit.y), Mathf.RoundToInt(raycastHit.z)) * buildingScale;
+                    floorposition = snapToGrid(hit.point, buildingScale / 2, buildingScale, buildingScale / 2); 
                     structureGuidelines.transform.position = floorposition;
                     break;
             }
-
-            
-
         }
 
         //rotate the stairs
@@ -102,7 +96,7 @@ public class BuildingStructure : MonoBehaviour
         structureGuidelines = Instantiate(structurePrefabs[structureIndex], buildingTransform);
     }
 
-
+    //DONE
     /// <summary>
     ///changes the gamemode that the player is in
     /// turns the builder guidelines on and off
@@ -118,6 +112,23 @@ public class BuildingStructure : MonoBehaviour
         else
             Destroy(structureGuidelines);
 
+    }
+
+
+
+    public float floatModulo(float a, float b)
+    {
+        float remainder;
+        return a;
+    }
+    public Vector3 snapToGrid(Vector3 position, float xSnap, float ySnap, float zSnap)
+    {
+        float x, y , z;
+        x = Mathf.RoundToInt(position.x/xSnap)*xSnap;
+        y = Mathf.RoundToInt(position.y/ySnap)*ySnap;
+        z = Mathf.RoundToInt(position.z/zSnap)*zSnap;
+        Vector3 snappedVector = new Vector3(x, y, z);
+        return snappedVector;
     }
 
 }
